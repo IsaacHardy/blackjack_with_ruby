@@ -8,9 +8,11 @@ class Player
 
   def win_hand
     @money += 10
+    puts "You win."
   end
 
   def lose_hand
     @money -= 10
+    puts "You lose."
   end
 end

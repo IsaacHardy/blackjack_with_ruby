@@ -11,11 +11,14 @@ class Game
     while @player.money > 0 do
       puts "You have $#{@player.money} and bet $10."
 
-      start_hand
+      @deck = Deck.new
+      @deck.shuffle
+
+      new_hand("player")
 
       while get_hit_or_stand do
         @hand.push(@deck.draw)
-        player_hand_total
+        hand_total
 
         cards = []
         @hand.each_with_index do |card, index|
@@ -27,31 +30,65 @@ class Game
         puts "You have a #{cards.join(", ")} and a #{@hand[@hand.length - 1].value} in your hand. Your total is #{@total}."
       end
 
-
-      @player.lose_hand
+      determine_winner
     end
     puts "You have no more money left to play."
   end
 
-  def start_hand
-    @deck = Deck.new
-    @deck.shuffle
-    @hand = []
+  def determine_winner
+    new_hand("dealer")
+    while @dealer_total < @total
+      @dealer_hand.push(@deck.draw)
+      dealer_hand_total
 
-    2.times do
-      @hand.push(@deck.draw)
+      puts "Dealer total is #{@dealer_total}."
     end
 
-    player_hand_total
-    puts "You have a #{@hand[0].value} and a #{@hand[1].value} in your hand. Your total is #{@total}."
+    if @dealer_total > @total && @dealer_total <= 21
+      @player.lose_hand
+    else
+      @player.win_hand
+    end
   end
 
-  def player_hand_total
+  def new_hand(who)
+
+    if who == "player"
+      @hand = []
+
+      2.times do
+        @hand.push(@deck.draw)
+      end
+
+      hand_total
+      puts "You have a #{@hand[0].value} and a #{@hand[1].value} in your hand. Your total is #{@total}."
+    elsif who == "dealer"
+      @dealer_hand = []
+
+      2.times do
+        @dealer_hand.push(@deck.draw)
+      end
+
+      dealer_hand_total
+    end
+  end
+
+  def hand_total
     values = @hand.map do |card|
       card.value
     end
 
     @total = values.reduce do |total, value|
+      total += value
+    end
+  end
+
+  def dealer_hand_total
+    values = @dealer_hand.map do |card|
+      card.value
+    end
+
+    @dealer_total = values.reduce do |total, value|
       total += value
     end
   end
