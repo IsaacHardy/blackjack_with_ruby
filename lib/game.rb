@@ -2,9 +2,14 @@ require_relative "deck"
 require_relative "player"
 
 class Game
-
+  TOTAL = 0
   def initialize
     @player = Player.new
+    @deck
+    @hand
+    @total
+    @dealer_total
+    @dealer_hand
   end
 
   def run_game
@@ -23,11 +28,11 @@ class Game
         cards = []
         @hand.each_with_index do |card, index|
           if index != @hand.length - 1
-            cards.push(card.value)
+            cards.push(card.rank)
           end
         end
 
-        puts "You have a #{cards.join(", ")} and a #{@hand[@hand.length - 1].value} in your hand. Your total is #{@total}."
+        puts "You have a #{cards.join(", ")} and a #{@hand[@hand.length - 1].rank} in your hand. Your total is #{@total}."
       end
 
       determine_winner
@@ -61,7 +66,7 @@ class Game
       end
 
       hand_total
-      puts "You have a #{@hand[0].value} and a #{@hand[1].value} in your hand. Your total is #{@total}."
+      puts "You have a #{@hand[0].rank} and a #{@hand[1].rank} in your hand. Your total is #{@total}."
     elsif who == "dealer"
       @dealer_hand = []
 
@@ -74,22 +79,66 @@ class Game
   end
 
   def hand_total
-    values = @hand.map do |card|
+    aces = @hand.select do |card|
+      card.rank == :A
+    end
+
+    non_aces = @hand.select do |card|
+      card.rank != :A
+    end
+
+    aces_values = aces.map do |card|
       card.value
     end
 
-    @total = values.reduce do |total, value|
+    non_aces_values = non_aces.map do |card|
+      card.value
+    end
+
+    @total = non_aces_values.reduce do |total, value|
       total += value
+    end
+
+    if aces_values.length > 0
+      aces_values.each do |value|
+        if @total < 11
+          @total += value
+        else
+          @total += 1
+        end
+      end
     end
   end
 
   def dealer_hand_total
-    values = @dealer_hand.map do |card|
+    aces = @dealer_hand.select do |card|
+      card.rank == :A
+    end
+
+    non_aces = @dealer_hand.select do |card|
+      card.rank != :A
+    end
+
+    aces_values = aces.map do |card|
       card.value
     end
 
-    @dealer_total = values.reduce do |total, value|
+    non_aces_values = non_aces.map do |card|
+      card.value
+    end
+
+    @dealer_total = non_aces_values.reduce do |total, value|
       total += value
+    end
+
+    if aces_values.length > 0
+      aces_values.each do |value|
+        if @dealer_total < 11
+          @dealer_total += value
+        else
+          @dealer_total += 1
+        end
+      end
     end
   end
 

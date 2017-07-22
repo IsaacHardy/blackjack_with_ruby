@@ -1,3 +1,5 @@
+require_relative "game"
+
 class Card
   RANKS = [:A, 2, 3, 4, 5, 6, 7, 8, 9, 10, :J, :Q, :K]
   SUITS = [:clubs, :diamonds, :hearts, :spades]
@@ -20,7 +22,7 @@ class Card
 
   def card_value
     if @rank == :A
-      return 1
+      return 11
     elsif @rank == :J || @rank == :Q || @rank == :K
       return 10
     else
