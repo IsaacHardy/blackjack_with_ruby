@@ -7,7 +7,6 @@ class Game
     @player = Player.new
   end
 
-
   def run_game
     while @player.money > 0 do
       puts "You have $#{@player.money} and bet $10."
@@ -16,11 +15,18 @@ class Game
 
       while get_hit_or_stand do
         @hand.push(@deck.draw)
+        player_hand_total
 
-        @hand.each do |card|
-          puts card.rank
+        cards = []
+        @hand.each_with_index do |card, index|
+          if index != @hand.length - 1
+            cards.push(card.value)
+          end
         end
+
+        puts "You have a #{cards.join(", ")} and a #{@hand[@hand.length - 1].value} in your hand. Your total is #{@total}."
       end
+
 
       @player.lose_hand
     end
@@ -34,6 +40,19 @@ class Game
 
     2.times do
       @hand.push(@deck.draw)
+    end
+
+    player_hand_total
+    puts "You have a #{@hand[0].value} and a #{@hand[1].value} in your hand. Your total is #{@total}."
+  end
+
+  def player_hand_total
+    values = @hand.map do |card|
+      card.value
+    end
+
+    @total = values.reduce do |total, value|
+      total += value
     end
   end
 
