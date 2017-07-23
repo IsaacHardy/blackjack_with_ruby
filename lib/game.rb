@@ -32,7 +32,8 @@ class Game
           end
         end
 
-        puts "You have a #{cards.join(", ")} and a #{@hand[@hand.length - 1].rank} in your hand. Your total is #{@total}."
+        puts "You hit. You have a #{cards.join(", ")} and a #{@hand[@hand.length - 1].rank} in your hand. Your total is #{@total}."
+        break if @total > 21
       end
 
       determine_winner
@@ -42,16 +43,29 @@ class Game
 
   def determine_winner
     new_hand("dealer")
-    while @dealer_total < @total
-      @dealer_hand.push(@deck.draw)
-      dealer_hand_total
 
-      puts "Dealer total is #{@dealer_total}."
+    if @total > 21
+      puts "You bust."
+      return @player.lose_hand
     end
 
+    while @dealer_total <= 21
+      break if @dealer_total > @total || @dealer_total == 21
+      puts "The dealer hits."
+
+      @dealer_hand.push(@deck.draw)
+      dealer_hand_total
+    end
+
+
     if @dealer_total > @total && @dealer_total <= 21
+      puts "The dealer stands. The dealer total has a total of #{@dealer_total}. You lose!"
       @player.lose_hand
+    elsif @dealer_total > 21 && @total <= 21
+      puts "The dealer total has a total of #{@dealer_total}. The dealer busts. You win!"
+      @player.win_hand
     else
+      puts "The dealer stands. The dealer total has a total of #{@dealer_total}. You win!"
       @player.win_hand
     end
   end
@@ -146,6 +160,7 @@ class Game
     while true
       print "Do you want to (h)it or (s)tand? "
       answer = gets.chomp.downcase
+      puts
       if answer[0] == "h"
         return true
       elsif answer[0] == "s"
